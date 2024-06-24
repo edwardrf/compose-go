@@ -17,12 +17,17 @@ const (
 var defaultLogger atomic.Value
 
 func init() {
-	defaultLogger.Store(Slogger{})
+	// Default logger has an extra skip to account for the log function
+	defaultLogger.Store(&Slogger{
+		logger: slog.Default(),
+		skip:   4,
+	})
 }
 
-// Default returns the default Logger.
-func Default() Logger { return defaultLogger.Load().(Logger) }
 func SetDefault(l Logger) {
+	if sl, ok := l.(Slogger); ok {
+		sl.skip = 4
+	}
 	defaultLogger.Store(l)
 }
 
@@ -39,12 +44,18 @@ type Logger interface {
 	Errorf(format string, args ...interface{})
 	Fatal(args ...interface{})
 	Fatalf(format string, args ...interface{})
-	Log(level slog.Level, args ...interface{})
-	Logf(level slog.Level, format string, args ...interface{})
 }
 
 type Slogger struct {
-	logger slog.Logger
+	logger *slog.Logger
+	skip   int
+}
+
+func New() Logger {
+	return &Slogger{
+		logger: slog.Default(),
+		skip:   3,
+	}
 }
 
 func (l Slogger) log(level slog.Level, line string) {
@@ -52,7 +63,7 @@ func (l Slogger) log(level slog.Level, line string) {
 		return
 	}
 	var pcs [1]uintptr
-	runtime.Callers(3, pcs[:]) // Skip [Caller, log, XXXf]
+	runtime.Callers(l.skip, pcs[:]) // Skip [Caller, log, XXXf]
 	r := slog.NewRecord(time.Now(), level, line, pcs[0])
 	_ = l.logger.Handler().Handle(context.Background(), r)
 }

@@ -23,7 +23,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/compose-spec/compose-go/v2/log"
 )
 
 var delimiter = "\\$"
@@ -203,7 +203,7 @@ func DefaultReplacementAppliedFunc(substring string, mapping Mapping, cfg *Confi
 
 	value, ok := mapping(substitution)
 	if !ok && cfg.logging {
-		logrus.Warnf("The %q variable is not set. Defaulting to a blank string.", substitution)
+		log.Warnf("The %q variable is not set. Defaulting to a blank string.", substitution)
 	}
 
 	return value, ok, nil

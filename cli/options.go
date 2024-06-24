@@ -25,12 +25,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/compose-spec/compose-go/v2/consts"
 	"github.com/compose-spec/compose-go/v2/dotenv"
 	"github.com/compose-spec/compose-go/v2/errdefs"
 	"github.com/compose-spec/compose-go/v2/loader"
+	"github.com/compose-spec/compose-go/v2/log"
 	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/compose-spec/compose-go/v2/utils"
 )
@@ -164,16 +163,16 @@ func WithDefaultConfigPath(o *ProjectOptions) error {
 		if len(candidates) > 0 {
 			winner := candidates[0]
 			if len(candidates) > 1 {
-				logrus.Warnf("Found multiple config files with supported names: %s", strings.Join(candidates, ", "))
-				logrus.Warnf("Using %s", winner)
+				log.Warnf("Found multiple config files with supported names: %s", strings.Join(candidates, ", "))
+				log.Warnf("Using %s", winner)
 			}
 			o.ConfigPaths = append(o.ConfigPaths, winner)
 
 			overrides := findFiles(DefaultOverrideFileNames, pwd)
 			if len(overrides) > 0 {
 				if len(overrides) > 1 {
-					logrus.Warnf("Found multiple override files with supported names: %s", strings.Join(overrides, ", "))
-					logrus.Warnf("Using %s", overrides[0])
+					log.Warnf("Found multiple override files with supported names: %s", strings.Join(overrides, ", "))
+					log.Warnf("Using %s", overrides[0])
 				}
 				o.ConfigPaths = append(o.ConfigPaths, overrides[0])
 			}

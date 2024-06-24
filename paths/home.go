@@ -21,14 +21,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/compose-spec/compose-go/v2/log"
 )
 
 func ExpandUser(p string) string {
 	if strings.HasPrefix(p, "~") {
 		home, err := os.UserHomeDir()
 		if err != nil {
-			logrus.Warn("cannot expand '~', because the environment lacks HOME")
+			log.Warn("cannot expand '~', because the environment lacks HOME")
 			return p
 		}
 		return filepath.Join(home, p[1:])
